@@ -1,5 +1,6 @@
 package com.example.pwa_shop.service;
 
+import com.example.pwa_shop.dto.ProductResponseDto;
 import com.example.pwa_shop.model.entity.Product;
 import com.example.pwa_shop.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,22 +14,46 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
-    public Product create(Product product) {
+    public ProductResponseDto create(Product product) {
         if (product.getAvailable() == null) {
             product.setAvailable(true);
         }
-        return productRepository.save(product);
+
+        Product savedProduct = productRepository.save(product);
+        return toDto(savedProduct);
     }
 
-    public List<Product> getAll() {
-        return productRepository.findAll();
+    public List<ProductResponseDto> getAll() {
+        return productRepository.findAll()
+                .stream()
+                .map(this::toDto)
+                .toList();
     }
 
-    public List<Product> getByCategory(Long categoryId) {
-        return productRepository.findByCategoryId(categoryId);
+    public List<ProductResponseDto> getByCategory(Long categoryId) {
+        return productRepository.findByCategoryId(categoryId)
+                .stream()
+                .map(this::toDto)
+                .toList();
     }
-    public Product getById(Long id) {
-        return productRepository.findById(id)
+
+    public ProductResponseDto getById(Long id) {
+        Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
+        return toDto(product);
+    }
+
+    private ProductResponseDto toDto(Product product) {
+        return new ProductResponseDto(
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getStockQuantity(),
+                product.getAvailable(),
+                product.getImageUrl(),
+                product.getCategory() != null ? product.getCategory().getId() : null,
+                product.getCategory() != null ? product.getCategory().getName() : null
+        );
     }
 }
