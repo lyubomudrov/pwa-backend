@@ -35,7 +35,7 @@ public class CartController {
             @RequestParam int quantity
     ) {
         User user = userService.getById(userId);
-        Product product = productService.getById(productId);
+        Product product = productService.getEntityById(productId);
 
         Cart cart = cartService.getOrCreateCart(user);
 

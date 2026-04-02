@@ -38,9 +38,12 @@ public class ProductService {
     }
 
     public ProductResponseDto getById(Long id) {
-        Product product = productRepository.findById(id)
+        return toDto(getEntityById(id));
+    }
+
+    public Product getEntityById(Long id) {
+        return productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
-        return toDto(product);
     }
 
     private ProductResponseDto toDto(Product product) {
