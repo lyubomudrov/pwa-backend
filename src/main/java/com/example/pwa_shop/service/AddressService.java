@@ -1,5 +1,7 @@
 package com.example.pwa_shop.service;
 
+import com.example.pwa_shop.dto.AddressResponseDto;
+import com.example.pwa_shop.mapper.EntityDtoMapper;
 import com.example.pwa_shop.model.entity.Address;
 import com.example.pwa_shop.model.entity.User;
 import com.example.pwa_shop.repository.AddressRepository;
@@ -15,17 +17,21 @@ public class AddressService {
 
     private final AddressRepository addressRepository;
     private final UserRepository userRepository;
+    private final EntityDtoMapper mapper;
 
-    public Address create(Long userId, Address address) {
+    public AddressResponseDto create(Long userId, Address address) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         address.setUser(user);
-        return addressRepository.save(address);
+        return mapper.toAddressDto(addressRepository.save(address));
     }
 
-    public List<Address> getByUserId(Long userId) {
-        return addressRepository.findByUserId(userId);
+    public List<AddressResponseDto> getByUserId(Long userId) {
+        return addressRepository.findByUserId(userId)
+                .stream()
+                .map(mapper::toAddressDto)
+                .toList();
     }
 
     public void delete(Long addressId, Long userId) {

@@ -1,5 +1,7 @@
 package com.example.pwa_shop.service;
 
+import com.example.pwa_shop.dto.CartItemResponseDto;
+import com.example.pwa_shop.mapper.EntityDtoMapper;
 import com.example.pwa_shop.model.entity.Cart;
 import com.example.pwa_shop.model.entity.CartItem;
 import com.example.pwa_shop.model.entity.Product;
@@ -14,14 +16,15 @@ import java.util.List;
 public class CartItemService {
 
     private final CartItemRepository cartItemRepository;
+    private final EntityDtoMapper mapper;
 
-    public CartItem addProductToCart(Cart cart, Product product, int quantity) {
+    public CartItemResponseDto addProductToCart(Cart cart, Product product, int quantity) {
 
         if (quantity <= 0) {
             throw new RuntimeException("Quantity must be positive");
         }
 
-        return cartItemRepository
+        CartItem savedItem = cartItemRepository
                 .findByCartIdAndProductId(cart.getId(), product.getId())
                 .map(item -> {
                     item.setQuantity(item.getQuantity() + quantity);
@@ -34,14 +37,18 @@ public class CartItemService {
                     item.setQuantity(quantity);
                     return cartItemRepository.save(item);
                 });
+
+        return mapper.toCartItemDto(savedItem);
     }
 
-    public List<CartItem> getByCartId(Long cartId) {
-        return cartItemRepository.findByCartId(cartId);
+    public List<CartItemResponseDto> getByCartId(Long cartId) {
+        return cartItemRepository.findByCartId(cartId)
+                .stream()
+                .map(mapper::toCartItemDto)
+                .toList();
     }
 
     public void remove(Long id) {
         cartItemRepository.deleteById(id);
     }
 }
-

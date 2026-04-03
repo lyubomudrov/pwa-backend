@@ -1,5 +1,7 @@
 package com.example.pwa_shop.service;
 
+import com.example.pwa_shop.dto.CategoryResponseDto;
+import com.example.pwa_shop.mapper.EntityDtoMapper;
 import com.example.pwa_shop.model.entity.Category;
 import com.example.pwa_shop.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,12 +14,16 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final EntityDtoMapper mapper;
 
-    public Category create(Category category) {
-        return categoryRepository.save(category);
+    public CategoryResponseDto create(Category category) {
+        return mapper.toCategoryDto(categoryRepository.save(category));
     }
 
-    public List<Category> getAll() {
-        return categoryRepository.findAll();
+    public List<CategoryResponseDto> getAll() {
+        return categoryRepository.findAll()
+                .stream()
+                .map(mapper::toCategoryDto)
+                .toList();
     }
 }

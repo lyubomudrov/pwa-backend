@@ -1,5 +1,6 @@
 package com.example.pwa_shop.controller;
 
+import com.example.pwa_shop.dto.CategoryResponseDto;
 import com.example.pwa_shop.model.entity.Category;
 import com.example.pwa_shop.service.CategoryService;
 import lombok.RequiredArgsConstructor;
@@ -15,15 +16,12 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping
-    public List<Category> getAll() {
+    public List<CategoryResponseDto> getAll() {
         return categoryService.getAll();
     }
 
-
-
     @PostMapping
-    public Category create(@RequestBody Category category) {
+    public CategoryResponseDto create(@RequestBody Category category) {
         return categoryService.create(category);
     }
 }
-

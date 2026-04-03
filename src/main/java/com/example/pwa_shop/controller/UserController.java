@@ -1,5 +1,6 @@
 package com.example.pwa_shop.controller;
 
+import com.example.pwa_shop.dto.UserResponseDto;
 import com.example.pwa_shop.model.entity.User;
 import com.example.pwa_shop.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -15,17 +16,17 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public User create(@RequestBody User user) {
+    public UserResponseDto create(@RequestBody User user) {
         return userService.create(user);
     }
 
     @GetMapping("/{id}")
-    public User getById(@PathVariable Long id) {
-        return userService.getById(id);
+    public UserResponseDto getById(@PathVariable Long id) {
+        return userService.getByIdDto(id);
     }
 
     @GetMapping
-    public List<User> getAll() {
+    public List<UserResponseDto> getAll() {
         return userService.getAll();
     }
 
@@ -34,4 +35,3 @@ public class UserController {
         userService.delete(id);
     }
 }
-
