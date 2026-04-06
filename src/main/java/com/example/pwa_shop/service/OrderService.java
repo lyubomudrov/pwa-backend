@@ -1,5 +1,7 @@
 package com.example.pwa_shop.service;
 
+import com.example.pwa_shop.dto.OrderResponseDto;
+import com.example.pwa_shop.mapper.EntityDtoMapper;
 import com.example.pwa_shop.model.entity.*;
 import com.example.pwa_shop.model.enums.OrderStatus;
 import com.example.pwa_shop.repository.*;
@@ -14,28 +16,27 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class OrderService {
+
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
+    private final EntityDtoMapper mapper;
 
     @Transactional
     public Order placeOrder(User user, Address address) {
 
-        // Корзина пользователя
         Cart cart = cartRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
-        // Элементы корзины
         List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getId());
 
         if (cartItems.isEmpty()) {
             throw new RuntimeException("Cart is empty");
         }
 
-        // Создаём заказ (НО НЕ СОХРАНЯЕМ)
         Order order = new Order();
         order.setUser(user);
         order.setAddress(address);
@@ -44,16 +45,14 @@ public class OrderService {
 
         BigDecimal totalAmount = BigDecimal.ZERO;
 
-        //  Создание OrderItem
         for (CartItem cartItem : cartItems) {
-
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
             orderItem.setProduct(cartItem.getProduct());
             orderItem.setQuantity(cartItem.getQuantity());
             orderItem.setPurchasePrice(cartItem.getProduct().getPrice());
 
-            order.getItems().add(orderItem); // 🔥 ВАЖНО
+            order.getItems().add(orderItem);
 
             totalAmount = totalAmount.add(
                     orderItem.getPurchasePrice()
@@ -61,19 +60,17 @@ public class OrderService {
             );
         }
 
-        // Итоговая сумма
         order.setTotalAmount(totalAmount);
 
-        // Сохраняем заказ ОДИН РАЗ
         Order savedOrder = orderRepository.save(order);
 
-        // Очищаем корзину
         cartItemRepository.deleteAll(cartItems);
 
         return savedOrder;
     }
+
     @Transactional
-    public Order createOrder(Long userId, Long addressId) {
+    public OrderResponseDto createOrder(Long userId, Long addressId) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -85,14 +82,21 @@ public class OrderService {
             throw new RuntimeException("Address does not belong to user");
         }
 
-        return placeOrder(user, address);
+        Order savedOrder = placeOrder(user, address);
+        return mapper.toOrderDto(savedOrder);
     }
-    public List<Order> getOrdersByUser(Long userId) {
-        return orderRepository.findByUserId(userId);
+
+    public List<OrderResponseDto> getOrdersByUser(Long userId) {
+        return orderRepository.findByUserId(userId)
+                .stream()
+                .map(mapper::toOrderDto)
+                .toList();
     }
-    public Order getById(Long orderId) {
-        return orderRepository.findById(orderId)
+
+    public OrderResponseDto getById(Long orderId) {
+        Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        return mapper.toOrderDto(order);
     }
 }
-

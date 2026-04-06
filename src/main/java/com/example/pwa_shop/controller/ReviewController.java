@@ -1,10 +1,8 @@
 package com.example.pwa_shop.controller;
 
-
-
+import com.example.pwa_shop.dto.ReviewResponseDto;
 import com.example.pwa_shop.model.entity.Review;
 import com.example.pwa_shop.service.ReviewService;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,12 +16,12 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping
-    public Review create(@RequestBody Review review) {
+    public ReviewResponseDto create(@RequestBody Review review) {
         return reviewService.create(review);
     }
 
     @GetMapping("/product/{productId}")
-    public List<Review> getByProduct(@PathVariable Long productId) {
+    public List<ReviewResponseDto> getByProduct(@PathVariable Long productId) {
         return reviewService.getByProduct(productId);
     }
 }
