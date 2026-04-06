@@ -37,6 +37,9 @@ public class User {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
     @OneToOne(
             mappedBy = "user",
