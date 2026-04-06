@@ -1,7 +1,7 @@
 package com.example.pwa_shop.controller;
 
 import com.example.pwa_shop.dto.AddressResponseDto;
-import com.example.pwa_shop.model.entity.Address;
+import com.example.pwa_shop.dto.CreateAddressRequestDto;
 import com.example.pwa_shop.service.AddressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,11 +16,8 @@ public class AddressController {
     private final AddressService addressService;
 
     @PostMapping
-    public AddressResponseDto createAddress(
-            @RequestParam Long userId,
-            @RequestBody Address address
-    ) {
-        return addressService.create(userId, address);
+    public AddressResponseDto createAddress(@RequestBody CreateAddressRequestDto request) {
+        return addressService.create(request);
     }
 
     @GetMapping("/user/{userId}")

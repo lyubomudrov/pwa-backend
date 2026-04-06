@@ -1,6 +1,7 @@
 package com.example.pwa_shop.service;
 
 import com.example.pwa_shop.dto.AddressResponseDto;
+import com.example.pwa_shop.dto.CreateAddressRequestDto;
 import com.example.pwa_shop.mapper.EntityDtoMapper;
 import com.example.pwa_shop.model.entity.Address;
 import com.example.pwa_shop.model.entity.User;
@@ -19,11 +20,18 @@ public class AddressService {
     private final UserRepository userRepository;
     private final EntityDtoMapper mapper;
 
-    public AddressResponseDto create(Long userId, Address address) {
-        User user = userRepository.findById(userId)
+    public AddressResponseDto create(CreateAddressRequestDto request) {
+        User user = userRepository.findById(request.userId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        address.setUser(user);
+        Address address = Address.builder()
+                .city(request.city())
+                .street(request.street())
+                .houseNumber(request.houseNumber())
+                .postalCode(request.postalCode())
+                .user(user)
+                .build();
+
         return mapper.toAddressDto(addressRepository.save(address));
     }
 

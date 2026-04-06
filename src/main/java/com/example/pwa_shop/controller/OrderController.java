@@ -1,5 +1,6 @@
 package com.example.pwa_shop.controller;
 
+import com.example.pwa_shop.dto.CreateOrderRequestDto;
 import com.example.pwa_shop.dto.OrderResponseDto;
 import com.example.pwa_shop.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -15,11 +16,8 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public OrderResponseDto createOrder(
-            @RequestParam Long userId,
-            @RequestParam Long addressId
-    ) {
-        return orderService.createOrder(userId, addressId);
+    public OrderResponseDto createOrder(@RequestBody CreateOrderRequestDto request) {
+        return orderService.createOrder(request.userId(), request.addressId());
     }
 
     @GetMapping("/user/{userId}")

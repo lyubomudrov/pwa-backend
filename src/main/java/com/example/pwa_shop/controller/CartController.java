@@ -1,9 +1,7 @@
 package com.example.pwa_shop.controller;
 
+import com.example.pwa_shop.dto.AddToCartRequestDto;
 import com.example.pwa_shop.dto.CartItemResponseDto;
-import com.example.pwa_shop.model.entity.Cart;
-import com.example.pwa_shop.model.entity.Product;
-import com.example.pwa_shop.model.entity.User;
 import com.example.pwa_shop.service.CartItemService;
 import com.example.pwa_shop.service.CartService;
 import com.example.pwa_shop.service.ProductService;
@@ -31,17 +29,8 @@ public class CartController {
     }
 
     @PostMapping("/add")
-    public CartItemResponseDto addToCart(
-            @RequestParam Long userId,
-            @RequestParam Long productId,
-            @RequestParam int quantity
-    ) {
-        User user = userService.getById(userId);
-        Product product = productService.getEntityById(productId);
-
-        Cart cart = cartService.getOrCreateCart(user);
-
-        return cartItemService.addProductToCart(cart, product, quantity);
+    public CartItemResponseDto addToCart(@RequestBody AddToCartRequestDto request) {
+        return cartItemService.addToCart(request);
     }
 
     @DeleteMapping("/item/{cartItemId}")

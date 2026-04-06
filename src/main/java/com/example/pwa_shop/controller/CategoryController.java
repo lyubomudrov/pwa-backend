@@ -1,7 +1,7 @@
 package com.example.pwa_shop.controller;
 
 import com.example.pwa_shop.dto.CategoryResponseDto;
-import com.example.pwa_shop.model.entity.Category;
+import com.example.pwa_shop.dto.CreateCategoryRequestDto;
 import com.example.pwa_shop.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +21,7 @@ public class CategoryController {
     }
 
     @PostMapping
-    public CategoryResponseDto create(@RequestBody Category category) {
-        return categoryService.create(category);
+    public CategoryResponseDto create(@RequestBody CreateCategoryRequestDto request) {
+        return categoryService.create(request);
     }
 }

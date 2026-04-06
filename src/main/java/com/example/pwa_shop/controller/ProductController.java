@@ -1,7 +1,7 @@
 package com.example.pwa_shop.controller;
 
+import com.example.pwa_shop.dto.CreateProductRequestDto;
 import com.example.pwa_shop.dto.ProductResponseDto;
-import com.example.pwa_shop.model.entity.Product;
 import com.example.pwa_shop.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +31,7 @@ public class ProductController {
     }
 
     @PostMapping
-    public ProductResponseDto create(@RequestBody Product product) {
-        return productService.create(product);
+    public ProductResponseDto create(@RequestBody CreateProductRequestDto request) {
+        return productService.create(request);
     }
 }

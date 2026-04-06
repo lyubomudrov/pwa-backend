@@ -1,5 +1,6 @@
 package com.example.pwa_shop.service;
 
+import com.example.pwa_shop.dto.CreateUserRequestDto;
 import com.example.pwa_shop.dto.UserResponseDto;
 import com.example.pwa_shop.mapper.EntityDtoMapper;
 import com.example.pwa_shop.model.entity.User;
@@ -16,7 +17,14 @@ public class UserService {
     private final UserRepository userRepository;
     private final EntityDtoMapper mapper;
 
-    public UserResponseDto create(User user) {
+    public UserResponseDto create(CreateUserRequestDto request) {
+        User user = User.builder()
+                .email(request.email())
+                .password(request.password())
+                .firstName(request.firstName())
+                .lastName(request.lastName())
+                .build();
+
         return mapper.toUserDto(userRepository.save(user));
     }
 

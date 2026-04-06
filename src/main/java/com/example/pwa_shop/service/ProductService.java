@@ -1,7 +1,10 @@
 package com.example.pwa_shop.service;
 
+import com.example.pwa_shop.dto.CreateProductRequestDto;
 import com.example.pwa_shop.dto.ProductResponseDto;
+import com.example.pwa_shop.model.entity.Category;
 import com.example.pwa_shop.model.entity.Product;
+import com.example.pwa_shop.repository.CategoryRepository;
 import com.example.pwa_shop.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,11 +16,21 @@ import java.util.List;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
 
-    public ProductResponseDto create(Product product) {
-        if (product.getAvailable() == null) {
-            product.setAvailable(true);
-        }
+    public ProductResponseDto create(CreateProductRequestDto request) {
+        Category category = categoryRepository.findById(request.categoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+
+        Product product = Product.builder()
+                .name(request.name())
+                .description(request.description())
+                .price(request.price())
+                .stockQuantity(request.stockQuantity())
+                .available(request.available() != null ? request.available() : true)
+                .imageUrl(request.imageUrl())
+                .category(category)
+                .build();
 
         Product savedProduct = productRepository.save(product);
         return toDto(savedProduct);
