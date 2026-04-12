@@ -6,7 +6,6 @@ import com.example.pwa_shop.mapper.EntityDtoMapper;
 import com.example.pwa_shop.model.entity.Address;
 import com.example.pwa_shop.model.entity.User;
 import com.example.pwa_shop.repository.AddressRepository;
-import com.example.pwa_shop.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,13 +16,9 @@ import java.util.List;
 public class AddressService {
 
     private final AddressRepository addressRepository;
-    private final UserRepository userRepository;
     private final EntityDtoMapper mapper;
 
-    public AddressResponseDto create(CreateAddressRequestDto request) {
-        User user = userRepository.findById(request.userId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
+    public AddressResponseDto create(CreateAddressRequestDto request, User user) {
         Address address = Address.builder()
                 .city(request.city())
                 .street(request.street())
@@ -35,20 +30,16 @@ public class AddressService {
         return mapper.toAddressDto(addressRepository.save(address));
     }
 
-    public List<AddressResponseDto> getByUserId(Long userId) {
-        return addressRepository.findByUserId(userId)
+    public List<AddressResponseDto> getCurrentUserAddresses(User user) {
+        return addressRepository.findByUserId(user.getId())
                 .stream()
                 .map(mapper::toAddressDto)
                 .toList();
     }
 
-    public void delete(Long addressId, Long userId) {
-        Address address = addressRepository.findById(addressId)
+    public void deleteForUser(Long addressId, User user) {
+        Address address = addressRepository.findByIdAndUserId(addressId, user.getId())
                 .orElseThrow(() -> new RuntimeException("Address not found"));
-
-        if (!address.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Access denied");
-        }
 
         addressRepository.delete(address);
     }

@@ -2,10 +2,10 @@ package com.example.pwa_shop.controller;
 
 import com.example.pwa_shop.dto.AddToCartRequestDto;
 import com.example.pwa_shop.dto.CartItemResponseDto;
+import com.example.pwa_shop.model.entity.User;
 import com.example.pwa_shop.service.CartItemService;
-import com.example.pwa_shop.service.CartService;
-import com.example.pwa_shop.service.ProductService;
 import com.example.pwa_shop.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,25 +16,24 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CartController {
 
-    private final CartService cartService;
     private final CartItemService cartItemService;
     private final UserService userService;
-    private final ProductService productService;
 
-    @GetMapping("/{userId}")
-    public List<CartItemResponseDto> getCart(@PathVariable Long userId) {
-        return cartService.findByUserId(userId)
-                .map(cart -> cartItemService.getByCartId(cart.getId()))
-                .orElse(List.of());
+    @GetMapping
+    public List<CartItemResponseDto> getCart() {
+        User currentUser = userService.getCurrentUser();
+        return cartItemService.getByUser(currentUser);
     }
 
     @PostMapping("/add")
-    public CartItemResponseDto addToCart(@RequestBody AddToCartRequestDto request) {
-        return cartItemService.addToCart(request);
+    public CartItemResponseDto addToCart(@Valid @RequestBody AddToCartRequestDto request) {
+        User currentUser = userService.getCurrentUser();
+        return cartItemService.addToCart(request, currentUser);
     }
 
     @DeleteMapping("/item/{cartItemId}")
     public void removeItem(@PathVariable Long cartItemId) {
-        cartItemService.remove(cartItemId);
+        User currentUser = userService.getCurrentUser();
+        cartItemService.remove(cartItemId, currentUser);
     }
 }

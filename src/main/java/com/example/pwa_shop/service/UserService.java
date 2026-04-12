@@ -7,6 +7,9 @@ import com.example.pwa_shop.model.entity.Role;
 import com.example.pwa_shop.model.entity.User;
 import com.example.pwa_shop.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +46,25 @@ public class UserService {
     public User getById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || authentication instanceof AnonymousAuthenticationToken) {
+            throw new RuntimeException("User is not authenticated");
+        }
+
+        String email = authentication.getName();
+
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Authenticated user not found"));
+    }
+
+    public UserResponseDto getCurrentUserDto() {
+        return mapper.toUserDto(getCurrentUser());
     }
 
     public List<UserResponseDto> getAll() {

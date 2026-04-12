@@ -1,7 +1,8 @@
 package com.example.pwa_shop.dto;
 
+import jakarta.validation.constraints.NotNull;
+
 public record CreateOrderRequestDto(
-        Long userId,
-        Long addressId
+        @NotNull Long addressId
 ) {
 }
