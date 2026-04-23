@@ -36,6 +36,29 @@ public class ProductService {
         return toDto(savedProduct);
     }
 
+    public ProductResponseDto update(Long id, CreateProductRequestDto request) {
+        Product product = getEntityById(id);
+
+        Category category = categoryRepository.findById(request.categoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+
+        product.setName(request.name());
+        product.setDescription(request.description());
+        product.setPrice(request.price());
+        product.setStockQuantity(request.stockQuantity());
+        product.setAvailable(request.available() != null ? request.available() : true);
+        product.setImageUrl(request.imageUrl());
+        product.setCategory(category);
+
+        Product updatedProduct = productRepository.save(product);
+        return toDto(updatedProduct);
+    }
+
+    public void delete(Long id) {
+        Product product = getEntityById(id);
+        productRepository.delete(product);
+    }
+
     public List<ProductResponseDto> getAll() {
         return productRepository.findAll()
                 .stream()

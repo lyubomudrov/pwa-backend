@@ -26,10 +26,29 @@ public class CategoryService {
         return mapper.toCategoryDto(categoryRepository.save(category));
     }
 
+    public CategoryResponseDto update(Long id, CreateCategoryRequestDto request) {
+        Category category = getEntityById(id);
+
+        category.setName(request.name());
+        category.setDescription(request.description());
+
+        return mapper.toCategoryDto(categoryRepository.save(category));
+    }
+
+    public void delete(Long id) {
+        Category category = getEntityById(id);
+        categoryRepository.delete(category);
+    }
+
     public List<CategoryResponseDto> getAll() {
         return categoryRepository.findAll()
                 .stream()
                 .map(mapper::toCategoryDto)
                 .toList();
+    }
+
+    public Category getEntityById(Long id) {
+        return categoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
     }
 }
